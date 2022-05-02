@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react"
 import { useHistory } from 'react-router-dom'
+import { getCategories } from "../category/CategoryManager.js"
 import { createGame } from "./GameManager.js"
 
 
 export const GameForm = () => {
     const history = useHistory()
     const currentYear = new Date().getFullYear()
+    const [categories, setCategories] = useState([])
+    const [categoryArray, setNewCategories] = useState([])
 
     const [currentGame, setCurrentGame] = useState({
         title:"",
@@ -16,6 +19,11 @@ export const GameForm = () => {
         ageRecommendation:6,
         estimatedTimeToPlay:"60 minutes"
     })
+
+    useEffect(() => {
+        getCategories()
+            .then(data => setCategories(data))
+    }, [])
 
     const changeGameState = (domEvent) => {
         const copy = {...currentGame}
@@ -33,6 +41,8 @@ export const GameForm = () => {
             copy.ageRecommendation = domEvent.target.value
         } else if (domEvent.target.name === "estimatedTimeToPlay") {
             copy.estimatedTimeToPlay = domEvent.target.value
+        } else if (domEvent.target.name === "category") {
+            copy.category = parseInt(domEvent.target.value)
         }
 
         setCurrentGame(copy)
@@ -92,6 +102,52 @@ export const GameForm = () => {
                     onChange={changeGameState}
                     />
                 </div>
+                <div className="form__group">
+                    <label htmlFor="category">Categories: </label>
+                    {categoryArray.length === 0 ? 
+                    //No Categories
+                    <>
+                    <select name="category" required autoFocus className="form-control" onChange={changeGameState}><option value="0" hidden>Select a category</option>
+                    {categories.map(category => {
+                        return <option key={`category--${category.id}`} value={category.id}>{category.label}</option>
+                    })}
+                </select>
+                    <button onClick={e => {
+                        e.preventDefault()
+                        const currentCategoryObject = categories.find(category => category.id === currentGame.category)
+                        const copy = [...categoryArray]
+                        copy.push(currentCategoryObject)
+                        setNewCategories(copy)
+                    }} >Add Category</button>
+                    </>
+                    :
+                    //Pre-existing Categories
+                    <>
+                    <ul className="category--list">
+                    {categoryArray.map(category => {
+                        return (
+                            <li className="current--categories" key={`category--${category.id}`}>{category.label} 
+                            </li>
+                            )})}
+                        </ul>
+                        <select name="category" required autoFocus className="form-control" onChange={changeGameState}><option value="0" hidden>Select a category</option>
+                    {categories.map(category => {
+                        return <option key={`category--${category.id}`} value={category.id}>{category.label}</option>
+                    })}
+                </select>
+                    <button onClick={e => {
+                        e.preventDefault()
+                        const currentCategoryObject = categories.find(category => category.id === currentGame.category)
+                        const copy = [...categoryArray]
+                        copy.push(currentCategoryObject)
+                        setNewCategories(copy)
+                    }} >Add Category</button>
+
+
+                    </>
+                }
+                    
+                </div>
             </fieldset>
 
             <button type="submit"
@@ -105,11 +161,13 @@ export const GameForm = () => {
                         year_released: currentGame.yearReleased,
                         number_of_players: currentGame.numberOfPlayers,
                         age_recommendation: currentGame.ageRecommendation,
-                        estimated_time_to_play: currentGame.estimatedTimeToPlay
+                        estimated_time_to_play: currentGame.estimatedTimeToPlay,
+                        category: categoryArray.map(category => category.id)
 
                     }
                     createGame(game)
                         .then(() => history.push("/games"))
+
 
                 }}
                 className="btn btn-primary">Create
