@@ -1,4 +1,5 @@
 import React from "react"
+import "./GamerRater.css"
 import { Route, Redirect } from "react-router-dom"
 import { ApplicationViews } from "./ApplicationViews.js"
 import { NavBar } from "./nav/NavBar"

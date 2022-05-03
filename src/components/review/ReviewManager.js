@@ -1,5 +1,5 @@
-export const getGames = () => {
-    return fetch("http://localhost:8000/games", {
+export const getReviews = () => {
+    return fetch("http://localhost:8000/reviews", {
         headers:{
             "Authorization": `Token ${localStorage.getItem("gr_token")}`
         }
@@ -7,8 +7,8 @@ export const getGames = () => {
         .then(response => response.json())
 }
 
-export const getSingleGame = (gameId) => {
-    return fetch(`http://localhost:8000/games/${gameId}`, {
+export const getSingleGameReviews = (gameId) => {
+    return fetch(`http://localhost:8000/reviews?game=${gameId}`, {
         headers:{
             "Authorization": `Token ${localStorage.getItem("gr_token")}`
         }
@@ -16,28 +16,24 @@ export const getSingleGame = (gameId) => {
         .then(response => response.json())
 }
 
-export const createGame = (game) => {
-    return fetch("http://localhost:8000/games", {
+
+export const createReview = (review) => {
+    return fetch("http://localhost:8000/reviews", {
         method: `POST`, 
         headers:{
             "Content-Type": "application/json",
             "Authorization": `Token ${localStorage.getItem("gr_token")}`
         },
-        body: JSON.stringify(game)
+        body: JSON.stringify(review)
     })
-        .then(response => response.json())
 }
-
-
-
-
-export const editGame = (game, gameId) => {
-    return fetch(`http://localhost:8000/games/${gameId}`, {
-        method: `PUT`, 
+export const createRating = (rating) => {
+    return fetch("http://localhost:8000/ratings", {
+        method: `POST`, 
         headers:{
             "Content-Type": "application/json",
             "Authorization": `Token ${localStorage.getItem("gr_token")}`
         },
-        body: JSON.stringify(game)
+        body: JSON.stringify(rating)
     })
 }

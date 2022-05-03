@@ -16,9 +16,11 @@ export const GameList = (props) => {
 
     return (
         <article className="games">
+
             {
                 games.map(game => {
                     return <>
+                    
                     <section key={`game--${game.id}`} className="game">
                         <div className="game__title"><Link to={`/games/${game.id}`}>
                             {game.title}</Link></div>

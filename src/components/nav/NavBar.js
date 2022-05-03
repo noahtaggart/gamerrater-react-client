@@ -9,11 +9,6 @@ export const NavBar = () => {
     return (
         <ul className="navbar">
             <li className="navbar__item">
-                <Link className="navbar__link" to="/events">
-                    Events
-                </Link>
-            </li>
-            <li className="navbar__item">
             <Link className="navbar__link" to="/games">
                     Games
                 </Link>
@@ -21,11 +16,6 @@ export const NavBar = () => {
             <li className="navbar__item">
             <Link className="navbar__link" to="/games/new">
                     New Games
-                </Link>
-            </li>
-            <li className="navbar__item">
-            <Link className="navbar__link" to="/events/new">
-                    New Event
                 </Link>
             </li>
             {
