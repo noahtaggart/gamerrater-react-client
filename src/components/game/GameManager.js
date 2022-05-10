@@ -28,6 +28,18 @@ export const createGame = (game) => {
         .then(response => response.json())
 }
 
+export const createPhoto = (photo) => {
+    return fetch("http://localhost:8000/photos", {
+        method: `POST`, 
+        headers:{
+            "Content-Type": "application/json",
+            "Authorization": `Token ${localStorage.getItem("gr_token")}`
+        },
+        body: JSON.stringify(photo)
+    })
+        .then(response => response.json())
+}
+
 
 
 

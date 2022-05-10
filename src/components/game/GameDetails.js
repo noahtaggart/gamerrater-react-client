@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom"
 import { useParams } from "react-router-dom"
 import { getUser } from "../auth/AuthManager.js"
 import { createRating, getSingleGameReviews } from "../review/ReviewManager.js"
-import { getSingleGame } from "./GameManager.js"
+import { createPhoto, getSingleGame } from "./GameManager.js"
 import ReactStars from "react-rating-stars-component"
 
 
@@ -15,6 +15,7 @@ export const GameDetails = () => {
     const [leaveRating, setLeaveRating] = useState(false)
     const [newRating, setNewRating] = useState()
     const [refreshState, setRefreshState] = useState(false)
+    const [base64ImageState, setBase64ImageState] = useState()
     const history = useHistory()
 
     useEffect(() => {
@@ -24,28 +25,43 @@ export const GameDetails = () => {
             .then(data => setReviews(data))
         getUser()
             .then(data => setUser(data))
-            
+
     }, [refreshState])
+
+    const getBase64 = (file, callback) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result));
+        reader.readAsDataURL(file);
+    }
+    
+    const createGameImageString = (event) => {
+        getBase64(event.target.files[0], (base64ImageString) => {
+            console.log("Base64 of file is", base64ImageString);
+            setBase64ImageState(base64ImageString)
+    
+            // Update a component state variable to the value of base64ImageString
+        });
+    }
 
 
     return (
         <>
-        
+
             <article className="games" key={`game--${currentGame.id}`}>
                 <div className="game__title">{currentGame.title}</div>
                 {leaveRating === false ? //leave rating is not pressed
-                <>
-                {currentGame.average_rating > 0 ?
                     <>
-                        <ReactStars count={10} edit={false} value={currentGame.average_rating} isHalf={true} size={25} /> 
-                    </>
-                    : //no ratings
-                    <><p>Be the first to leave a rating!</p>
-                        
-                    </>}
+                        {currentGame.average_rating > 0 ?
+                            <>
+                                <ReactStars count={10} edit={false} value={currentGame.average_rating} isHalf={true} size={25} />
+                            </>
+                            : //no ratings
+                            <><p>Be the first to leave a rating!</p>
 
-                    
-                    <button onClick={(e) => setLeaveRating(true)}>Leave a Rating?</button></>
+                            </>}
+
+
+                        <button onClick={(e) => setLeaveRating(true)}>Leave a Rating?</button></>
                     : //after leave a rating button is pressed
                     <>
                         <ReactStars count={10} isHalf={true} onChange={newValue => setNewRating(newValue)} size={25} />
@@ -54,8 +70,8 @@ export const GameDetails = () => {
                             ratingObject.rating = newRating
                             ratingObject.game_id = gameId
                             createRating(ratingObject)
-                            .then(() => setLeaveRating(false))
-                            .then(() => setRefreshState(true))
+                                .then(() => setLeaveRating(false))
+                                .then(() => setRefreshState(true))
                         }}>Save Rating</button>
                     </>
                 }
@@ -98,8 +114,17 @@ export const GameDetails = () => {
                 <button onClick={() => history.push(`/games/${gameId}/review`)}>Leave a Review</button>
                 {currentUser.user_id === currentGame.creator?.user ? <button onClick={() => history.push(`/games/${gameId}/edit`)}>Edit Game</button> : ""}
 
+                <input type="file" id="game_image" onChange={createGameImageString} />
+                <input type="hidden" name="game_id" value={gameId} />
+                <button onClick={() => {
+                    const photoObject = {}
+                    photoObject.game_id = gameId
+                    photoObject.game_image = base64ImageState
+                    createPhoto(photoObject).then(() => setBase64ImageState(undefined))
+                }}>Upload</button>
+
             </article>
-        
+
         </>
     )
 }
